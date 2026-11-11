@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f7f8fa"><meta name="description" content="Sangam Calculator: basic, interest and age calculators."><link rel="manifest" href="manifest.webmanifest">
+<title>Sangam Calculator</title>
+<style>
+:root{color-scheme:light;--bg:#f4f6f8;--card:#fff;--text:#17202b;--muted:#667085;--line:#e6e9ee;--accent:#2563eb;--accent-soft:#eaf1ff;--danger:#dc2626;--shadow:0 12px 32px rgba(20,32,50,.07)}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#10151d;--card:#19212c;--text:#edf2f7;--muted:#a0acbb;--line:#2b3746;--accent:#6b9cff;--accent-soft:#233653;--danger:#ff7777;--shadow:0 12px 32px rgba(0,0,0,.22)}
+:root[data-theme="dark"] .tabs{background:#202a37}
+:root[data-theme="dark"] .tab{color:#a0acbb}
+:root[data-theme="dark"] .tab.active{background:#303d4e;color:var(--text);box-shadow:none}
+:root[data-theme="dark"] .screen{background:#131b25}
+:root[data-theme="dark"] .key{background:#202b38;color:var(--text);border-color:var(--line)}
+:root[data-theme="dark"] .key.op{background:#263343}
+:root[data-theme="dark"] .key.clear{background:#382629;color:#ff9999}
+:root[data-theme="dark"] input,:root[data-theme="dark"] select{background:#131b25;color:var(--text);border-color:var(--line)}
+:root[data-theme="dark"] label,:root[data-theme="dark"] .result .detail{color:#b5c0ce}
+:root[data-theme="dark"] .result{background:#233653}
+:root[data-theme="dark"] .key.equal,:root[data-theme="dark"] .primary{background:var(--accent);color:#101827}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+.app{max-width:760px;margin:0 auto;padding:24px 16px 40px}
+header{display:flex;align-items:center;gap:12px;margin:8px 0 24px}.head-actions{margin-left:auto;display:flex;gap:8px}.icon-btn{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;width:42px;height:42px;cursor:pointer;font-size:17px}.logo{width:46px;height:46px;border-radius:14px;background:#17202b;color:white;display:grid;place-items:center;font-weight:800;font-size:20px;letter-spacing:-1px}
+h1{font-size:22px;line-height:1.2;margin:0}header p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:#e9edf2;padding:5px;border-radius:14px;margin-bottom:16px}
+.tab{border:0;background:transparent;border-radius:10px;padding:11px 6px;font:600 14px inherit;color:#5b6472;cursor:pointer}.tab.active{background:white;color:var(--text);box-shadow:0 2px 8px #17202b12}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow)}
+.screen{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:16px;text-align:right;margin-bottom:14px;min-height:94px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.small{font-size:13px;color:var(--muted);min-height:20px;overflow-wrap:anywhere}.display{font-size:32px;font-weight:650;letter-spacing:-1px;overflow-wrap:anywhere}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.key{border:1px solid var(--line);background:#fff;border-radius:18px;min-height:54px;font:600 18px inherit;color:var(--text);cursor:pointer}
+.key:active,.tab:active{transform:scale(.98)}.key.op{background:#f1f5f9}.key.equal{background:var(--accent);border-color:var(--accent);color:white}.key.clear{color:var(--danger);background:#fff5f5}
+.section-title{font-size:18px;margin:0 0 4px}.hint{color:var(--muted);font-size:13px;margin:0 0 18px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}
+label{font-size:13px;font-weight:600;color:#475467}
+input,select{width:100%;border:1px solid #d9dee7;border-radius:11px;padding:12px 13px;font:inherit;color:var(--text);background:white;outline:none}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px #2563eb18}
+.primary{border:0;border-radius:18px;background:var(--accent);color:white;font:650 15px inherit;padding:13px 16px;width:100%;cursor:pointer;margin-top:16px}
+.result{background:var(--accent-soft);border-radius:14px;padding:15px;margin-top:16px;display:none}
+.result.show{display:block}.result .value{font-size:25px;font-weight:750;letter-spacing:-.5px}.result .detail{font-size:13px;color:#475467;margin-top:3px}
+.note{font-size:12px;color:var(--muted);margin:14px 2px 0}
+.history{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
+.history-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.history-head h3{font-size:15px;margin:0}
+.text-btn{border:0;background:transparent;color:var(--accent);font:600 13px inherit;cursor:pointer;padding:7px}
+.history-list{display:grid;gap:8px;margin-top:10px}
+.history-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 12px;background:var(--bg);border-radius:12px;font-size:13px}
+.history-item strong{font-size:14px;overflow-wrap:anywhere;text-align:right}
+.history-empty{font-size:13px;color:var(--muted);padding:8px 0}
+button{ -webkit-tap-highlight-color:transparent;transition:transform .08s ease,filter .12s ease}
+button:active{transform:scale(.96);filter:brightness(.97)}
+@media(max-width:480px){.app{padding:18px 12px 30px}.panel{padding:15px}.fields{grid-template-columns:1fr}.field.full{grid-column:auto}.key{min-height:52px}.display{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="logo">S</div><div><h1>Sangam Calculator</h1><p>Simple tools for everyday calculations</p></div><div class="head-actions"><button class="icon-btn" id="soundToggle" aria-label="Toggle click sound" title="Toggle click sound">🔊</button><button class="icon-btn" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button></div></header>
+<nav class="tabs" aria-label="Calculator modes">
+<button class="tab active" data-mode="basic">Calculator</button>
+<button class="tab" data-mode="interest">Interest</button>
+<button class="tab" data-mode="age">Age</button>
+</nav>
+
+<section class="panel" id="basic">
+<div class="screen"><div class="small" id="expression">Ready</div><div class="display" id="display" aria-live="polite">0</div></div>
+<div class="keys">
+<button class="key clear" data-action="clear">AC</button><button class="key op" data-action="delete">⌫</button><button class="key op" data-value="%">%</button><button class="key op" data-value="÷">÷</button>
+<button class="key" data-value="7">7</button><button class="key" data-value="8">8</button><button class="key" data-value="9">9</button><button class="key op" data-value="×">×</button>
+<button class="key" data-value="4">4</button><button class="key" data-value="5">5</button><button class="key" data-value="6">6</button><button class="key op" data-value="-">−</button>
+<button class="key" data-value="1">1</button><button class="key" data-value="2">2</button><button class="key" data-value="3">3</button><button class="key op" data-value="+">+</button>
+<button class="key" data-value="±">±</button><button class="key" data-value="0">0</button><button class="key" data-value=".">.</button><button class="key equal" data-action="equals">=</button>
+</div>
+<div class="history"><div class="history-head"><h3>Calculation history</h3><button class="text-btn" id="clearHistory">Clear history</button></div><div class="history-list" id="historyList"><div class="history-empty">Your calculations will appear here.</div></div></div>
+<p class="note">Use the buttons or your keyboard. Keyboard: Enter =, Backspace = delete, Esc = clear.</p>
+</section>
+
+<section class="panel" id="interest" hidden>
+<h2 class="section-title">Interest calculator</h2><p class="hint">Calculate simple or compound interest.</p>
+<div class="fields">
+<div class="field full"><label for="interestType">Interest type</label><select id="interestType"><option value="simple">Simple interest</option><option value="compound">Compound interest</option></select></div>
+<div class="field"><label for="principal">Principal amount (₹)</label><input id="principal" type="number" min="0" step="any" placeholder="e.g. 10000"></div>
+<div class="field"><label for="rate">Annual rate (%)</label><input id="rate" type="number" min="0" step="any" placeholder="e.g. 5"></div>
+<div class="field"><label for="years">Time (years)</label><input id="years" type="number" min="0" step="any" placeholder="e.g. 2"></div>
+<div class="field" id="frequencyField" hidden><label for="frequency">Compounding</label><select id="frequency"><option value="1">Yearly</option><option value="2">Half-yearly</option><option value="4">Quarterly</option><option value="12">Monthly</option></select></div>
+</div>
+<button class="primary" id="calculateInterest">Calculate interest</button>
+<div class="result" id="interestResult" aria-live="polite"></div>
+<p class="note">This is an estimate. It does not include fees, taxes, or other charges.</p>
+</section>
+
+<section class="panel" id="age" hidden>
+<h2 class="section-title">Age calculator</h2><p class="hint">Find your age in years, months and days.</p>
+<div class="field"><label for="birthDate">Date of birth</label><input id="birthDate" type="date"></div>
+<div class="field" style="margin-top:13px"><label for="asOfDate">Calculate age on</label><input id="asOfDate" type="date"></div>
+<button class="primary" id="calculateAge">Calculate age</button>
+<div class="result" id="ageResult" aria-live="polite"></div>
+</section>
+</div>
+<script>
+const tabs=[...document.querySelectorAll('.tab')];
+tabs.forEach(t=>t.addEventListener('click',()=>{tabs.forEach(x=>x.classList.toggle('active',x===t));['basic','interest','age'].forEach(id=>document.getElementById(id).hidden=id!==t.dataset.mode)}));
+
+let expr='',shown='0',justSolved=false;
+const display=document.getElementById('display'), expression=document.getElementById('expression');
+function render(){display.textContent=shown;expression.textContent=expr||'Ready'}
+function add(v){
+ if(v==='±'){if(shown!=='0'){shown=String(-Number(shown));expr=shown;render()}return}
+ if(justSolved && /[0-9.]/.test(v)){expr='';shown='0'} justSolved=false;
+ if(['+','-','×','÷','%'].includes(v)){
+   if(!expr && v==='-'){expr='-';shown='-';render();return}
+   if(/[+\-×÷%]$/.test(expr))expr=expr.slice(0,-1);
+   expr+=v;
+ }else{
+   if(v==='.' ){const part=expr.split(/[+\-×÷%]/).pop();if(part.includes('.'))return;if(!part)expr+='0'}
+   expr+=v;
+ }
+ shown=expr||'0';render();
+}
+function solve(){
+ if(!expr)return;
+ try{
+  let e=expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/(\d+(?:\.\d+)?)%/g,'($1/100)');
+  if(!/^[0-9+\-*/().\s]+$/.test(e))throw Error();
+  const result=Function('"use strict";return ('+e+')')();
+  if(!Number.isFinite(result))throw Error();
+  const original=expr;expression.textContent=original+' =';shown=String(Number(result.toPrecision(12)));expr=shown;justSolved=true;display.textContent=shown;addHistory('Calculator',original+' =',shown);
+ }catch{shown='Error';display.textContent=shown;expr='';justSolved=true}
+}
+document.querySelectorAll('.key').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.action,v=b.dataset.value;if(a==='clear'){expr='';shown='0';justSolved=false;render()}else if(a==='delete'){expr=expr.slice(0,-1);shown=expr||'0';render()}else if(a==='equals')solve();else add(v)}));
+document.addEventListener('keydown',e=>{if(document.getElementById('basic').hidden)return;if(/^[0-9.+\-/%]$/.test(e.key)){add(e.key==='/ ' ? '÷':e.key);e.preventDefault()}else if(e.key==='*'){add('×');e.preventDefault()}else if(e.key==='/'){add('÷');e.preventDefault()}else if(e.key==='Enter'||e.key==='='){solve();e.preventDefault()}else if(e.key==='Backspace'){expr=expr.slice(0,-1);shown=expr||'0';render()}else if(e.key==='Escape'){expr='';shown='0';render()}});
+const money=n=>'₹'+n.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const type=document.getElementById('interestType'),freqField=document.getElementById('frequencyField');
+type.addEventListener('change',()=>{freqField.hidden=type.value!=='compound';document.getElementById('interestResult').classList.remove('show')});
+document.getElementById('calculateInterest').addEventListener('click',()=>{
+ const p=Number(document.getElementById('principal').value),r=Number(document.getElementById('rate').value),t=Number(document.getElementById('years').value);
+ const out=document.getElementById('interestResult');
+ if(![p,r,t].every(Number.isFinite)||p<=0||r<0||t<0){out.innerHTML='<b>Please enter a principal above 0 and valid rate and time.</b>';out.classList.add('show');return}
+ let total,interest;
+ if(type.value==='simple'){interest=p*r*t/100;total=p+interest}
+ else{const n=Number(document.getElementById('frequency').value);total=p*Math.pow(1+r/(100*n),n*t);interest=total-p}
+ out.innerHTML=`<div class="detail">Interest earned</div><div class="value">${money(interest)}</div><div class="detail" style="margin-top:10px">Total amount</div><div style="font-size:19px;font-weight:700">${money(total)}</div>`;
+ out.classList.add('show');
+ addHistory('Interest',`${type.value==='simple'?'Simple':'Compound'} interest · ${money(p)} at ${r}% for ${t} year(s)`,money(total));
+});
+function dateUTC(s){const [y,m,d]=s.split('-').map(Number);return new Date(Date.UTC(y,m-1,d))}
+document.getElementById('asOfDate').value=new Date().toISOString().slice(0,10);
+document.getElementById('calculateAge').addEventListener('click',()=>{
+ const b=document.getElementById('birthDate').value,a=document.getElementById('asOfDate').value,out=document.getElementById('ageResult');
+ if(!b||!a){out.innerHTML='<b>Please select both dates.</b>';out.classList.add('show');return}
+ let start=dateUTC(b),end=dateUTC(a);
+ if(start>end){out.innerHTML='<b>Date of birth must be on or before the calculation date.</b>';out.classList.add('show');return}
+ let y=end.getUTCFullYear()-start.getUTCFullYear(),m=end.getUTCMonth()-start.getUTCMonth(),d=end.getUTCDate()-start.getUTCDate();
+ if(d<0){m--;const daysPrev=new Date(Date.UTC(end.getUTCFullYear(),end.getUTCMonth(),0)).getUTCDate();d+=daysPrev}
+ if(m<0){y--;m+=12}
+ const days=Math.floor((end-start)/86400000);
+ out.innerHTML=`<div class="detail">Your age</div><div class="value">${y} years</div><div style="font-size:18px;font-weight:650">${m} months, ${d} days</div><div class="detail" style="margin-top:10px">${days.toLocaleString('en-IN')} days in total</div>`;
+ out.classList.add('show');
+ addHistory('Age',`Age on ${a}`,`${y} years, ${m} months, ${d} days`);
+});
+
+// Theme and sound preferences are stored locally on this device.
+const root=document.documentElement;
+const themeToggle=document.getElementById('themeToggle');
+function applyTheme(theme){root.dataset.theme=theme;themeToggle.textContent=theme==='dark'?'☀️':'🌙';document.querySelector('meta[name="theme-color"]').content=theme==='dark'?'#10151d':'#f7f8fa'}
+applyTheme(localStorage.getItem('sangam-theme')||'light');
+themeToggle.addEventListener('click',()=>{const next=root.dataset.theme==='dark'?'light':'dark';localStorage.setItem('sangam-theme',next);applyTheme(next)});
+
+let soundOn=localStorage.getItem('sangam-sound')!=='off';
+const soundToggle=document.getElementById('soundToggle');
+function updateSoundButton(){soundToggle.textContent=soundOn?'🔊':'🔇';soundToggle.title=soundOn?'Turn click sound off':'Turn click sound on'}
+updateSoundButton();
+soundToggle.addEventListener('click',()=>{soundOn=!soundOn;localStorage.setItem('sangam-sound',soundOn?'on':'off');updateSoundButton()});
+let audioContext;
+function clickSound(){
+ if(!soundOn)return;
+ try{audioContext=audioContext||new (window.AudioContext||window.webkitAudioContext)();if(audioContext.state==='suspended')audioContext.resume();const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type='sine';osc.frequency.setValueAtTime(720,audioContext.currentTime);osc.frequency.exponentialRampToValueAtTime(470,audioContext.currentTime+.035);gain.gain.setValueAtTime(.045,audioContext.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audioContext.currentTime+.045);osc.connect(gain);gain.connect(audioContext.destination);osc.start();osc.stop(audioContext.currentTime+.05)}catch(e){}
+}
+document.addEventListener('click',e=>{if(e.target.closest('button'))clickSound()});
+
+// Keep the latest 50 entries in this browser.
+const historyList=document.getElementById('historyList');
+let historyItems=[];
+try{historyItems=JSON.parse(localStorage.getItem('sangam-history')||'[]')}catch(e){historyItems=[]}
+function renderHistory(){
+ historyList.innerHTML='';
+ if(!historyItems.length){historyList.innerHTML='<div class="history-empty">Your calculations will appear here.</div>';return}
+ historyItems.forEach(item=>{const row=document.createElement('div');row.className='history-item';const left=document.createElement('div');const category=document.createElement('div');category.textContent=item.category;category.style.color='var(--muted)';category.style.fontSize='11px';const detail=document.createElement('div');detail.textContent=item.detail;left.append(category,detail);const value=document.createElement('strong');value.textContent=item.value;row.append(left,value);historyList.append(row)})
+}
+function addHistory(category,detail,value){historyItems.unshift({category,detail,value});historyItems=historyItems.slice(0,50);localStorage.setItem('sangam-history',JSON.stringify(historyItems));renderHistory()}
+document.getElementById('clearHistory').addEventListener('click',()=>{historyItems=[];localStorage.removeItem('sangam-history');renderHistory()});
+renderHistory();
+
+// Register the offline app shell when served from localhost or HTTPS.
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}))}
+</script>
+</body>
+</html>
